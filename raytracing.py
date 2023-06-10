@@ -79,7 +79,7 @@ def get_color(obj, M):
         color = color(M)
     return color
 
-def trace_ray(rayO, rayD):
+def trace_ray(rayO, rayD, L, color_light):
     # Find first point of intersection with the scene.
     t = np.inf
     for i, obj in enumerate(scene):
@@ -132,8 +132,21 @@ scene = [add_sphere([.75, .1, 1.], .6, [0., 0., 1.]),
     ]
 
 # Light position and color.
-L = np.array([5., 5., -10.])
-color_light = np.ones(3)
+
+# Red light
+L1 = np.array([  0.,  20., -10.])
+color_light1 = np.array([1. , 0., 0.])
+
+# Green light
+L2 = np.array([  35., 20., -10.])
+color_light2 = np.array([0. , 1., 0.])
+
+# Blue light
+L3 = np.array([ -35., 20., -10.])
+color_light3 = np.array([0. , 0., 1.])
+
+light_points = [[L1, color_light1], [L2, color_light2], [L3, color_light3]]
+
 
 # Default light and material parameters.
 ambient = .05
@@ -164,15 +177,21 @@ for i, x in enumerate(np.linspace(S[0], S[2], w)):
         reflection = 1.
         # Loop through initial and secondary rays.
         while depth < depth_max:
-            traced = trace_ray(rayO, rayD)
-            if not traced:
-                break
-            obj, M, N, col_ray = traced
-            # Reflection: create a new ray.
-            rayO, rayD = M + N * .0001, normalize(rayD - 2 * np.dot(rayD, N) * N)
-            depth += 1
-            col += reflection * col_ray
-            reflection *= obj.get('reflection', 1.)
+            traced = []
+            for light in light_points:
+            	traced.append(trace_ray(rayO, rayD, light[0], light[1]))
+
+            if len(traced) == 0:
+		break
+            for trace in traced:
+            	# para evitar 'NoneType' object is not iterable
+            	if trace:
+		    obj, M, N, col_ray = trace
+		    # Reflection: create a new ray.
+		    rayO, rayD = M + N * .0001, normalize(rayD - 2 * np.dot(rayD, N) * N)
+		    col += reflection * col_ray
+		    reflection *= obj.get('reflection', 1.)
+	    depth += 1
         img[h - j - 1, i, :] = np.clip(col, 0, 1)
 
 plt.imsave('fig.png', img)
