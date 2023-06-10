@@ -200,7 +200,6 @@ color_light3 = np.array([0. , 0., 1.])
 
 light_points = [[L1, color_light1], [L2, color_light2], [L3, color_light3]]
 
-
 # Default light and material parameters.
 ambient = .05
 diffuse_c = 1.
@@ -209,13 +208,14 @@ specular_k = 50
 
 depth_max = 5  # Maximum number of light reflections.
 col = np.zeros(3)  # Current color.
-O = np.array([0., 0.35, -1.])  # Camera.
+O = np.array([0., 2000., -2000.])  # Camera.
 Q = np.array([0., 0., 0.])  # Camera pointing to.
 img = np.zeros((h, w, 3))
 
 r = float(w) / h
 # Screen coordinates: x0, y0, x1, y1.
-S = (-1., -1. / r + .25, 1., 1. / r + .25)
+S = (-4., -2. / r + .25, 2., 6. / r + .25)
+
 
 # Loop through all pixels.
 for i, x in enumerate(np.linspace(S[0], S[2], w)):
